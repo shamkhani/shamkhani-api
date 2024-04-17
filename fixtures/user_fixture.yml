@@ -1,0 +1,26 @@
+App\Entity\User:
+  user0:
+    name: <name()>
+    roles: [ROLE_USER]
+    company: '@company_1'
+    password: 123456
+  user1:
+    name: <name()>
+    roles: [ROLE_COMPANY_ADMIN]
+    company: '@company_2'
+    password: 123456
+  user2:
+    name: <name()>
+    roles: [ROLE_SUPER_ADMIN]
+    password: 123456
+
+App\Entity\ApiToken:
+  apiToken0:
+    token: TOKEN_USER
+    user: '@user0'
+  apiToken1:
+    token: TOKEN_COMPANY_ADMIN
+    user: '@user1'
+  apiToken2:
+    token: TOKEN_SUPER_ADMIN
+    user: '@user2'

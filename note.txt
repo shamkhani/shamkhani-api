@@ -1,0 +1,15 @@
+Task:
+
+- Create Entities
+    - User
+    - Company
+- Set Security For Create,Delete,Update
+- Set Security For Fetch data by role
+
+
+
+
+// Require for test
+symfony console --env=test doctrine:database:create
+symfony console --env=test doctrine:schema:create
+symfony console --env=test hautelook:fixtures:load
