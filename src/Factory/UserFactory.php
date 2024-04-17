@@ -10,7 +10,6 @@ use Zenstruck\Foundry\RepositoryProxy;
 
 /**
  * @extends ModelFactory<User>
- *
  * @method        User|Proxy                     create(array|callable $attributes = [])
  * @method static User|Proxy                     createOne(array $attributes = [])
  * @method static User|Proxy                     find(object|array|mixed $criteria)
@@ -31,7 +30,6 @@ final class UserFactory extends ModelFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
      * @todo inject services if required
      */
     public function __construct()
@@ -41,7 +39,6 @@ final class UserFactory extends ModelFactory
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
      * @todo add your default values here
      */
     protected function getDefaults(): array
@@ -57,9 +54,8 @@ final class UserFactory extends ModelFactory
      */
     protected function initialize(): self
     {
-        return $this
-            // ->afterInstantiate(function(User $user): void {})
-        ;
+        return $this// ->afterInstantiate(function(User $user): void {})
+            ;
     }
 
     protected static function getClass(): string
@@ -68,16 +64,19 @@ final class UserFactory extends ModelFactory
     }
 
 
-    protected function CompanyAdminRole(): self
+    public function companyAdminRole(): self
     {
-        return $this->addState(['roles'=>User::ROLE_COMPANY_ADMIN]);
+        return $this->addState(['roles' => [User::ROLE_COMPANY_ADMIN]])
+            ->addState(['company' => CompanyFactory::createOne()]);
     }
-    protected function SuperAdminRole(): self
+
+    public function superAdminRole(): self
     {
-        return $this->addState(['roles'=>User::ROLE_SUPER_ADMIN]);
+        return $this->addState(['roles' => [User::ROLE_SUPER_ADMIN]]);
     }
-    protected function UserRole(): self
+
+    public function userRole(): self
     {
-        return $this->addState(['roles'=>User::ROLE_USER]);
+        return $this->addState(['roles' => [User::ROLE_USER]]);
     }
 }

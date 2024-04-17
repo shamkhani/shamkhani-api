@@ -93,5 +93,19 @@ class CompanyTest extends BaseApiTestCase
 
         $this->browser()->post('api/companies', $options)
             ->assertStatus(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN);
+
+        $userToken = ApiTokenFactory::new()->companyAdminRole()->create();
+
+        $options = [
+            'headers' => [
+                "x-api-token" => $userToken->getToken()
+            ],
+            'json' => [
+                'name' => "X_COMPANY"
+            ],
+        ];
+
+        $this->browser()->post('api/companies', $options)
+            ->assertStatus(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN);
     }
 }

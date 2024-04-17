@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserVoter extends Voter
 {
-    public const UPDATE = 'UPDATE';
+    public const POST_UPDATE = 'POST_UPDATE';
 
     public function __construct(
         private Security $security,
@@ -21,7 +21,7 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::UPDATE])
+        return in_array($attribute, [self::POST_UPDATE])
             && $subject instanceof \App\Entity\User;
     }
 
@@ -37,18 +37,19 @@ class UserVoter extends Voter
         if ($this->security->isGranted(User::ROLE_SUPER_ADMIN)) {
             return true;
         }
-
         // ROLE_COMPANY_ADMIN can only change their user
         if ($this->security->isGranted(User::ROLE_COMPANY_ADMIN) &&
             $user->getCompany()->getId() === $subject->getCompany()->getId()) {
             return true;
         }
 
-//        if($user->getCompany()->)
-        // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
-            case self::UPDATE:
-
+            case self::POST_UPDATE:
+                if ($this->security->isGranted(User::ROLE_USER) &&
+                    !in_array(User::ROLE_SUPER_ADMIN,$user->getRoles()) &&
+                    !in_array(User::ROLE_COMPANY_ADMIN,$user->getRoles()) ){
+                    return true;
+                }
                 break;
         }
 

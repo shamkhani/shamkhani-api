@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use App\Entity\User;
 use App\Factory\ApiTokenFactory;
+use App\Factory\CompanyFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -148,7 +149,7 @@ class UserTest extends BaseApiTestCase
 
 
     /**
-     * Test create user not allowed user role
+     * Test create user not allowed ROLE_USER
      *
      * @return void
      */
@@ -168,7 +169,7 @@ class UserTest extends BaseApiTestCase
     }
 
     /**
-     * Test create user not allowed user role
+     * Test create user not allowed ROLE_USER
      *
      * @return void
      */
@@ -179,7 +180,7 @@ class UserTest extends BaseApiTestCase
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
             ], 'json' => [
-                'name' => "UserCompanyAdminRole",
+                'name' => "Usercompanyadminrole",
                 'roles' => [User::ROLE_USER],
                 'password' => "123456"
             ],
@@ -188,7 +189,7 @@ class UserTest extends BaseApiTestCase
     }
 
     /**
-     * Test delete user allowed only for super admin role
+     * Test delete user allowed only for ROLE_SUPER_ADMIN
      *
      * @return void
      */
@@ -200,7 +201,7 @@ class UserTest extends BaseApiTestCase
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
             ], 'json' => [
-                'name' => "DeleteUserBySuperAdmin",
+                'name' => "Deleteuserbysuperadmin",
                 'roles' => [User::ROLE_USER],
                 'password' => "123456"
             ],
@@ -209,7 +210,7 @@ class UserTest extends BaseApiTestCase
     }
 
     /**
-     * Test delete user not allowed user role
+     * Test delete user not allowed ROLE_USER
      *
      * @return void
      */
@@ -221,7 +222,7 @@ class UserTest extends BaseApiTestCase
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
             ], 'json' => [
-                'name' => "UserName",
+                'name' => "Usernamedeletenotallowed",
                 'roles' => [User::ROLE_USER],
                 'password' => "123456"
             ],
@@ -230,7 +231,7 @@ class UserTest extends BaseApiTestCase
     }
 
     /**
-     * Test delete user not allowed company admin role
+     * Test delete user not allowed company ROLE_COMPANY_ADMIN
      *
      * @return void
      */
@@ -242,11 +243,95 @@ class UserTest extends BaseApiTestCase
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
             ], 'json' => [
-                'name' => "UserName",
+                'name' => "Usernamedeletenotallowedbycompanyadmin",
                 'roles' => [User::ROLE_USER],
                 'password' => "123456"
             ],
         ];
         $this->browser()->delete('api/users/' . $user->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+
+    /**
+     * Test update role not allowed by ROLE_USER
+     *
+     * @return void
+     */
+    public function testUpdateUserRoleNotAllowedByUser(): void
+    {
+        $userToken = ApiTokenFactory::new()->userRole()->create();
+        $header = [
+            'headers' => [
+                "x-api-token" => $userToken->getToken(),
+                "Content-Type" => "application/merge-patch+json"
+            ], 'json' => [
+                'name' => "Updateusernotallowedrole",
+                'roles' => [User::ROLE_SUPER_ADMIN],
+                'password' => "123456"
+            ],
+        ];
+        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Test update user's name allowed by ROLE_USER
+     *
+     * @return void
+     */
+    public function testUpdateUserNameAllowedByUser(): void
+    {
+        $userToken = ApiTokenFactory::new()->userRole()->create();
+        $header = [
+            'headers' => [
+                "x-api-token" => $userToken->getToken(),
+                "Content-Type" => "application/merge-patch+json"
+            ], 'json' => [
+                'name' => "Updateusernamebyuser",
+                'password' => "123456"
+            ],
+        ];
+        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
+    }
+
+    /**
+     * Test update user's name allowed by ROLE_COMPANY_ADMIN
+     *
+     * @return void
+     */
+    public function testUpdateUserAllowedByCompanyAdmin(): void
+    {
+        $userToken = ApiTokenFactory::new()->companyAdminRole()->create();
+        $header = [
+            'headers' => [
+                "x-api-token" => $userToken->getToken(),
+                "Content-Type" => "application/merge-patch+json"
+            ], 'json' => [
+                'name' => "Updateusernamebycompanyadmin",
+                'roles' => [User::ROLE_SUPER_ADMIN],
+                'password' => "123456"
+            ],
+        ];
+        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
+    }
+
+    /**
+     * Test update user's name allowed by ROLE_SUPER_ADMIN
+     *
+     * @return void
+     */
+    public function testUpdateUserAllowedBySuperAdmin(): void
+    {
+        $userToken = ApiTokenFactory::new()->superAdminRole()->create();
+        $header = [
+            'headers' => [
+                "x-api-token" => $userToken->getToken(),
+                "Content-Type" => "application/merge-patch+json"
+            ], 'json' => [
+                'name' => "Updateusernamebysuperadmin",
+                'roles' => [User::ROLE_USER],
+                'password' => "123456"
+            ],
+        ];
+        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
     }
 }

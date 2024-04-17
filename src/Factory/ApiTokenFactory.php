@@ -72,14 +72,14 @@ final class ApiTokenFactory extends ModelFactory
 
     public function companyAdminRole(): self
     {
-        return $this->addState(['user' => UserFactory::new(["roles"=>[User::ROLE_COMPANY_ADMIN]])]);
+        return $this->addState(['user' => UserFactory::new()->companyAdminRole()->create()]);
     }
     public function superAdminRole(): self
     {
-        return $this->addState(['user' => UserFactory::new(["roles"=>[User::ROLE_SUPER_ADMIN]])]);
+        return $this->addState(['user' => UserFactory::new()->superAdminRole()->create()]);
     }
     public function userRole(): self
     {
-        return $this->addState(['user' => UserFactory::new(["roles"=>[User::ROLE_USER]])]);
+        return $this->addState(['user' => UserFactory::new()->userRole()->create()]);
     }
 }
