@@ -12,8 +12,13 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class UserTest extends BaseApiTestCase
 {
 
-    public function testGetCollection(): void
+    /**
+     * Test get user collection by super admin role - Get All Users
+     * @return void
+     */
+    public function testGetCollectionBySuperAdminRole(): void
     {
+        UserFactory::new()->withCompany()->many(10)->create();
         $userToken = ApiTokenFactory::new()->superAdminRole()->create();
         $header = [
             'headers' =>
@@ -21,9 +26,154 @@ class UserTest extends BaseApiTestCase
                     "x-api-token" => $userToken->getToken()
                 ]
         ];
-        $this->browser()->get('api/users', $header)->assertJson();
+        $this->browser()->get('api/users', $header)->assertJsonMatches('"hydra:totalItems"', 11);
     }
 
+    /**
+     * Test get user collection by admin company role - Get all company users
+     * @return void
+     */
+    public function testGetCollectionByCompanyAdminRole(): void
+    {
+        $company = CompanyFactory::createOne();
+        $company2 = CompanyFactory::createOne();
+        $company3 = CompanyFactory::createOne();
+
+        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::new()->many(2)->create(['company'=> $company2]);
+        UserFactory::new()->many(2)->create(['company'=> $company3]);
+
+        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users', $header)->assertJsonMatches('"hydra:totalItems"', 2);
+    }
+
+    /**
+     * Test get user collection by user role -Get all company users
+     *
+     * @return void
+     */
+    public function testGetCollectionByUserRole(): void
+    {
+        $company = CompanyFactory::createOne();
+        $company2 = CompanyFactory::createOne();
+        $company3 = CompanyFactory::createOne();
+
+        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        UserFactory::new()->many(2)->create(['company'=> $company2]);
+        UserFactory::new()->many(2)->create(['company'=> $company3]);
+
+        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users', $header)->assertJsonMatches('"hydra:totalItems"', 2);
+    }
+
+    /**
+     * Test get a user by super admin role
+     * @return void
+     */
+    public function testGetItemBySuperAdminRole(): void
+    {
+        $user = UserFactory::new()->withCompany()->create();
+        $userToken = ApiTokenFactory::new()->superAdminRole()->create();
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users/'. $user->getId(), $header)->assertJsonMatches('id', $user->getId());
+    }
+
+    /**
+     * Test get a user by company role
+     * @return void
+     */
+    public function testGetItemByCompanyAdminRole(): void
+    {
+        $company = CompanyFactory::createOne();
+        $company2 = CompanyFactory::createOne();
+        $company3 = CompanyFactory::createOne();
+
+        $userCompany1 = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
+        $userCompany2 = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::new()->many(2)->create(['company'=> $company2]);
+        UserFactory::new()->many(2)->create(['company'=> $company3]);
+
+        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany1]);
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users/'.$userCompany1->getId(), $header)->assertJsonMatches('id', $userCompany1->getId());
+        $this->browser()->get('api/users/'.$userCompany2->getId(), $header)->assertJsonMatches('id', $userCompany2->getId());
+    }
+
+    /**
+     * Test get a user by user role
+     *
+     * @return void
+     */
+    public function testGetItemByUserRole(): void
+    {
+        $company = CompanyFactory::createOne();
+        $company2 = CompanyFactory::createOne();
+        $company3 = CompanyFactory::createOne();
+
+        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        UserFactory::new()->many(2)->create(['company'=> $company2]);
+        UserFactory::new()->many(2)->create(['company'=> $company3]);
+
+        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users/'. $userCompany->getId(), $header)->assertJsonMatches('id', $userCompany->getId());
+    }
+
+    /**
+     * Test not allowed get other user by user role
+     *
+     * @return void
+     */
+    public function testGetItemNotAllowedGetOtherUserByUserRole(): void
+    {
+        $company = CompanyFactory::createOne();
+        $company2 = CompanyFactory::createOne();
+        $company3 = CompanyFactory::createOne();
+
+        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
+        $userCompany2 =  UserFactory::new()->create(['company'=> $company2]);
+        UserFactory::new()->many(2)->create(['company'=> $company3]);
+
+        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $header = [
+            'headers' =>
+                [
+                    "x-api-token" => $userToken->getToken()
+                ]
+        ];
+        $this->browser()->get('api/users/'. $userCompany2->getId(), $header)->assertStatus(Response::HTTP_NOT_FOUND);
+    }
     /**
      * Create user Successfully
      *

@@ -82,6 +82,7 @@
     "require-dev": {
         "hautelook/alice-bundle": "^2.14",
         "justinrainbow/json-schema": "^5.2",
+        "mtdowling/jmespath.php": "^2.7",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "7.0.*",
         "symfony/css-selector": "7.0.*",

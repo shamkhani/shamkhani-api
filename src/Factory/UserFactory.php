@@ -79,4 +79,9 @@ final class UserFactory extends ModelFactory
     {
         return $this->addState(['roles' => [User::ROLE_USER]]);
     }
+
+    public function withCompany(): self
+    {
+        return $this->addState(['company' => CompanyFactory::createOne()]);
+    }
 }
