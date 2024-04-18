@@ -11,9 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final readonly class UserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
-
 {
-
     public function __construct(
         private Security $security,
     ) {
@@ -29,8 +27,14 @@ final readonly class UserExtension implements QueryCollectionExtensionInterface,
         $this->addWhere($queryBuilder, $resourceClass);
     }
 
-    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, Operation $operation = null, array $context = []): void
-    {
+    public function applyToItem(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        array $identifiers,
+        Operation $operation = null,
+        array $context = []
+    ): void {
         $this->addWhere($queryBuilder, $resourceClass);
     }
 
@@ -40,11 +44,13 @@ final readonly class UserExtension implements QueryCollectionExtensionInterface,
             return;
         }
 
+        if(!$user->getCompany()){
+            return;
+        }
         $rootAlias = $queryBuilder->getRootAliases()[0];
         $user = $this->security->getUser();
 
         $queryBuilder->andWhere(sprintf('%s.company = :company_id', $rootAlias))
             ->setParameter('company_id', $user->getCompany()->getId());
-
     }
 }

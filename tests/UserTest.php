@@ -7,13 +7,13 @@ use App\Factory\ApiTokenFactory;
 use App\Factory\CompanyFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class UserTest extends BaseApiTestCase
 {
 
     /**
      * Test get user collection by super admin role - Get All Users
+     *
      * @return void
      */
     public function testGetCollectionBySuperAdminRole(): void
@@ -31,6 +31,7 @@ class UserTest extends BaseApiTestCase
 
     /**
      * Test get user collection by admin company role - Get all company users
+     *
      * @return void
      */
     public function testGetCollectionByCompanyAdminRole(): void
@@ -39,12 +40,12 @@ class UserTest extends BaseApiTestCase
         $company2 = CompanyFactory::createOne();
         $company3 = CompanyFactory::createOne();
 
-        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
-        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
-        UserFactory::new()->many(2)->create(['company'=> $company2]);
-        UserFactory::new()->many(2)->create(['company'=> $company3]);
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::new()->many(2)->create(['company' => $company2]);
+        UserFactory::new()->many(2)->create(['company' => $company3]);
 
-        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
         $header = [
             'headers' =>
                 [
@@ -65,12 +66,12 @@ class UserTest extends BaseApiTestCase
         $company2 = CompanyFactory::createOne();
         $company3 = CompanyFactory::createOne();
 
-        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        UserFactory::new()->many(2)->create(['company'=> $company2]);
-        UserFactory::new()->many(2)->create(['company'=> $company3]);
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        UserFactory::new()->many(2)->create(['company' => $company2]);
+        UserFactory::new()->many(2)->create(['company' => $company3]);
 
-        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
         $header = [
             'headers' =>
                 [
@@ -82,6 +83,7 @@ class UserTest extends BaseApiTestCase
 
     /**
      * Test get a user by super admin role
+     *
      * @return void
      */
     public function testGetItemBySuperAdminRole(): void
@@ -94,11 +96,12 @@ class UserTest extends BaseApiTestCase
                     "x-api-token" => $userToken->getToken()
                 ]
         ];
-        $this->browser()->get('api/users/'. $user->getId(), $header)->assertJsonMatches('id', $user->getId());
+        $this->browser()->get('api/users/'.$user->getId(), $header)->assertJsonMatches('id', $user->getId());
     }
 
     /**
      * Test get a user by company role
+     *
      * @return void
      */
     public function testGetItemByCompanyAdminRole(): void
@@ -107,20 +110,22 @@ class UserTest extends BaseApiTestCase
         $company2 = CompanyFactory::createOne();
         $company3 = CompanyFactory::createOne();
 
-        $userCompany1 = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
-        $userCompany2 = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_COMPANY_ADMIN]]);
-        UserFactory::new()->many(2)->create(['company'=> $company2]);
-        UserFactory::new()->many(2)->create(['company'=> $company3]);
+        $userCompany1 = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_COMPANY_ADMIN]]);
+        $userCompany2 = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_COMPANY_ADMIN]]);
+        UserFactory::new()->many(2)->create(['company' => $company2]);
+        UserFactory::new()->many(2)->create(['company' => $company3]);
 
-        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany1]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany1]);
         $header = [
             'headers' =>
                 [
                     "x-api-token" => $userToken->getToken()
                 ]
         ];
-        $this->browser()->get('api/users/'.$userCompany1->getId(), $header)->assertJsonMatches('id', $userCompany1->getId());
-        $this->browser()->get('api/users/'.$userCompany2->getId(), $header)->assertJsonMatches('id', $userCompany2->getId());
+        $this->browser()->get('api/users/'.$userCompany1->getId(), $header)
+            ->assertJsonMatches('id', $userCompany1->getId());
+        $this->browser()->get('api/users/'.$userCompany2->getId(), $header)
+            ->assertJsonMatches('id', $userCompany2->getId());
     }
 
     /**
@@ -134,19 +139,20 @@ class UserTest extends BaseApiTestCase
         $company2 = CompanyFactory::createOne();
         $company3 = CompanyFactory::createOne();
 
-        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        UserFactory::new()->many(2)->create(['company'=> $company2]);
-        UserFactory::new()->many(2)->create(['company'=> $company3]);
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        UserFactory::new()->many(2)->create(['company' => $company2]);
+        UserFactory::new()->many(2)->create(['company' => $company3]);
 
-        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
         $header = [
             'headers' =>
                 [
                     "x-api-token" => $userToken->getToken()
                 ]
         ];
-        $this->browser()->get('api/users/'. $userCompany->getId(), $header)->assertJsonMatches('id', $userCompany->getId());
+        $this->browser()->get('api/users/'.$userCompany->getId(), $header)
+            ->assertJsonMatches('id', $userCompany->getId());
     }
 
     /**
@@ -160,20 +166,21 @@ class UserTest extends BaseApiTestCase
         $company2 = CompanyFactory::createOne();
         $company3 = CompanyFactory::createOne();
 
-        $userCompany = UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        UserFactory::createOne(['company'=> $company, 'roles'=> [User::ROLE_USER]]);
-        $userCompany2 =  UserFactory::new()->create(['company'=> $company2]);
-        UserFactory::new()->many(2)->create(['company'=> $company3]);
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        $userCompany2 = UserFactory::new()->create(['company' => $company2]);
+        UserFactory::new()->many(2)->create(['company' => $company3]);
 
-        $userToken = ApiTokenFactory::createOne(['user'=>$userCompany]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
         $header = [
             'headers' =>
                 [
                     "x-api-token" => $userToken->getToken()
                 ]
         ];
-        $this->browser()->get('api/users/'. $userCompany2->getId(), $header)->assertStatus(Response::HTTP_NOT_FOUND);
+        $this->browser()->get('api/users/'.$userCompany2->getId(), $header)->assertStatus(Response::HTTP_NOT_FOUND);
     }
+
     /**
      * Create user Successfully
      *
@@ -196,6 +203,7 @@ class UserTest extends BaseApiTestCase
 
     /**
      * Test Not Allowed Lower case in the start position
+     *
      * @return void
      */
     public function testCreateUserNotAllowedLowerCaseInTheFirstPosition(): void
@@ -217,6 +225,7 @@ class UserTest extends BaseApiTestCase
 
     /**
      * Test create user now allowed all lower case
+     *
      * @return void
      */
     public function testCreateUserNotAllowedLowerCase(): void
@@ -350,13 +359,9 @@ class UserTest extends BaseApiTestCase
         $header = [
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
-            ], 'json' => [
-                'name' => "Deleteuserbysuperadmin",
-                'roles' => [User::ROLE_USER],
-                'password' => "123456"
-            ],
+            ]
         ];
-        $this->browser()->delete('api/users/' . $user->getId(), $header)->assertSuccessful();
+        $this->browser()->delete('api/users/'.$user->getId(), $header)->assertSuccessful();
     }
 
     /**
@@ -366,18 +371,15 @@ class UserTest extends BaseApiTestCase
      */
     public function testDeleteUserNotAllowedUserRole(): void
     {
-        $userToken = ApiTokenFactory::new()->userRole()->create();
-        $user = UserFactory::createOne();
+        $company = CompanyFactory::createOne();
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
         $header = [
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
-            ], 'json' => [
-                'name' => "Usernamedeletenotallowed",
-                'roles' => [User::ROLE_USER],
-                'password' => "123456"
-            ],
+            ]
         ];
-        $this->browser()->delete('api/users/' . $user->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
+        $this->browser()->delete('api/users/'.$userCompany->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /**
@@ -387,18 +389,17 @@ class UserTest extends BaseApiTestCase
      */
     public function testDeleteUserNotAllowedCompanyAdminRole(): void
     {
-        $userToken = ApiTokenFactory::new()->companyAdminRole()->create();
-        $user = UserFactory::createOne();
+        $company = CompanyFactory::createOne();
+        $userCompany = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_COMPANY_ADMIN]]);
+        $userCompany2 = UserFactory::createOne(['company' => $company, 'roles' => [User::ROLE_USER]]);
+        $userToken = ApiTokenFactory::createOne(['user' => $userCompany]);
+
         $header = [
             'headers' => [
                 "x-api-token" => $userToken->getToken(),
-            ], 'json' => [
-                'name' => "Usernamedeletenotallowedbycompanyadmin",
-                'roles' => [User::ROLE_USER],
-                'password' => "123456"
             ],
         ];
-        $this->browser()->delete('api/users/' . $user->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
+        $this->browser()->delete('api/users/'.$userCompany2->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
 
@@ -420,7 +421,8 @@ class UserTest extends BaseApiTestCase
                 'password' => "123456"
             ],
         ];
-        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertStatus(Response::HTTP_FORBIDDEN);
+        $this->browser()->patch('api/users/'.$userToken->getUser()->getId(), $header)
+            ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /**
@@ -440,7 +442,7 @@ class UserTest extends BaseApiTestCase
                 'password' => "123456"
             ],
         ];
-        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
+        $this->browser()->patch('api/users/'.$userToken->getUser()->getId(), $header)->assertSuccessful();
     }
 
     /**
@@ -461,7 +463,7 @@ class UserTest extends BaseApiTestCase
                 'password' => "123456"
             ],
         ];
-        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
+        $this->browser()->patch('api/users/'.$userToken->getUser()->getId(), $header)->assertSuccessful();
     }
 
     /**
@@ -482,6 +484,6 @@ class UserTest extends BaseApiTestCase
                 'password' => "123456"
             ],
         ];
-        $this->browser()->patch('api/users/' . $userToken->getUser()->getId(), $header)->assertSuccessful();
+        $this->browser()->patch('api/users/'.$userToken->getUser()->getId(), $header)->assertSuccessful();
     }
 }

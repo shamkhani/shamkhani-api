@@ -6,7 +6,6 @@ use App\Factory\ApiTokenFactory;
 
 class CompanyTest extends BaseApiTestCase
 {
-
     public function testGetCollection(): void
     {
         $userToken = ApiTokenFactory::new()->userRole()->create();

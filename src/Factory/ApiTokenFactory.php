@@ -3,7 +3,6 @@
 namespace App\Factory;
 
 use App\Entity\ApiToken;
-use App\Entity\User;
 use App\Repository\ApiTokenRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
