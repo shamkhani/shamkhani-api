@@ -4,7 +4,10 @@
 **Run via Docker:**
 
 
+    
     docker compose up -d
+    php composer install
+    
 
 
 **Create data schema**
